@@ -1,4 +1,4 @@
-package RickAndMortyGuesser;
+package controller.RickAndMortyGuesser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
@@ -22,14 +22,18 @@ import org.jsoup.Jsoup;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class RickAndMortyProfiler extends Application {
+
+    private static final Logger logger = Logger.getLogger(RickAndMortyProfiler.class.getSimpleName());
 
     private static final String API_BASE = "https://rickandmortyapi.com/api/character/";
     private static final String IMAGE_BASE_URL = API_BASE + "avatar/";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    Random random = new Random();
+    private Random random = new Random();
     private ImageView imageView;
     private Image randomImage;
     private Text characterNameText;
@@ -56,6 +60,7 @@ public class RickAndMortyProfiler extends Application {
         // Configure characterDetailsPane
         configureCharacterDetailsPane();
 
+
         // add CharacterDetailsPane to primaryPane
         primaryPane.getChildren().add(characterDetailsPane);
 
@@ -73,6 +78,8 @@ public class RickAndMortyProfiler extends Application {
         // Set up stage
         stage.setTitle("Who's that Ricky and Morty Character?");
         stage.setScene(primaryScene);
+        stage.setWidth(220);
+        stage.setHeight(300);
         stage.setMaxWidth(340);
         stage.setMaxHeight(400);
         stage.setResizable(false);
@@ -84,11 +91,16 @@ public class RickAndMortyProfiler extends Application {
         root = new Group();
         primaryPane = new VBox();
         characterDetailsPane = new GridPane();
+        logger.log(Level.INFO, "Configuring panes.");
     }
     private void configureImageNode() {
         imageView = new ImageView();
+        imageView.setFitWidth(200);
+        imageView.setLayoutX(20);
+        imageView.setY(50);
         imageView.setPreserveRatio(true);
         primaryPane.getChildren().add(imageView);
+        logger.log(Level.INFO, "Configuring Text Nodes.");
     }
     private void configureTextNodes() {
         nameLabel = new Label("Name: ");
@@ -102,6 +114,7 @@ public class RickAndMortyProfiler extends Application {
         characterSpeciesText.setFont(Font.font("Comic Sans", FontWeight.NORMAL, FontPosture.ITALIC, 14));
         characterSpeciesText.setTextAlignment(TextAlignment.CENTER);
         characterNameText.setTextAlignment(TextAlignment.CENTER);
+        logger.log(Level.INFO, "Configuring Text Nodes.");
     }
     private void configureCharacterDetailsPane() {
         characterDetailsPane.add(nameLabel, 0, 0);
@@ -110,6 +123,7 @@ public class RickAndMortyProfiler extends Application {
         characterDetailsPane.add(characterSpeciesText, 1, 1);
         characterDetailsPane.setHgap(10);
         characterDetailsPane.setVgap(5);
+        logger.log(Level.INFO, "configuring character details pane.");
     }
 
     private void grabRandomData(Event e) {
@@ -140,13 +154,16 @@ public class RickAndMortyProfiler extends Application {
 
             randomImage = new Image(resultImageResponse.bodyStream());
             imageView.setImage(randomImage);
+            logger.log(Level.INFO, "Performing data grab.");
         } catch (IOException exception) {
+            logger.throwing("RickAndMorty Application", "getRandomData", exception);
             exception.printStackTrace();
         }
 
     }
 
-    public void enterKeyPressedAction(KeyEvent e) {
+    private void enterKeyPressedAction(KeyEvent e) {
+        logger.log(Level.INFO, "Enter key pressed.");
         if (e.getCode() == KeyCode.ENTER) {
             grabRandomData(e);
         }

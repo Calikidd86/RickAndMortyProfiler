@@ -1,0 +1,21 @@
+<component name="ArtifactManager">
+  <artifact type="javafx" name="moreFx">
+    <output-path>$PROJECT_DIR$/out/artifacts/moreFx</output-path>
+    <properties id="javafx-properties">
+      <options>
+        <option name="appClass" value="RickAndMortyProfiler.java" />
+        <option name="description" value="" />
+        <option name="htmlPlaceholderId" value="" />
+        <option name="title" value="Rick and Morty Profiler" />
+        <option name="vendor" value="" />
+        <option name="version" value="" />
+      </options>
+    </properties>
+    <root id="root">
+      <element id="archive" name="moreFx.jar">
+        <element id="module-output" name="moreFx" />
+      </element>
+      <element id="artifact" artifact-name="moreFx:jar" />
+    </root>
+  </artifact>
+</component>

@@ -1,4 +1,5 @@
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -8,7 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -22,9 +23,10 @@ public class HiLoGame extends Application {
 
     private static final String INSTRUCTIONS = "Guess the hidden number between 1 and 100!";
     private static final String TOO_HIGH = "Your guess was too high!";
-    private static final String TOO_LOW = "Your guess was too low";
+    private static final String TOO_LOW = "Your guess was too low!";
     private static final String SUCCESS = "Lucky guess! You found the hidden number! \n Press Enter or click 'Submit'" +
             " to play again";
+    private static final String NUMBER_ERROR = "Please enter a numeric value between 1 and 100";
 
     private Button guessSubmissionButton;
     private Text guessResultText;
@@ -40,43 +42,40 @@ public class HiLoGame extends Application {
         guessSubmissionButton = new Button("Submit");
         guessSubmissionButton.setOnAction(this::guess);
         guessResultText = new Text();
-        hiddenNumber = numberGenerator.nextInt();
+        hiddenNumber = numberGenerator.nextInt(100) + 1;
 
         // Configure the pane being used to hold our nodes.
-        GridPane pane = new GridPane();
-        pane.setHgap(10);
-        pane.setVgap(10);
+        VBox pane = new VBox();
         pane.setPadding(new Insets(0, 10, 0, 10));
-        pane.setGridLinesVisible(true);
-        pane.setOnKeyPressed(this::guessEnter);
+        pane.setSpacing(10);
 
         // Add Game Description label to columns 1 - 4, row 1
         Label instructionLabel = new Label(INSTRUCTIONS);
         instructionLabel.setFont(Font.font("Arial", FontWeight.BOLD, FontPosture.ITALIC, 20));
         instructionLabel.setWrapText(true);
-        pane.add(instructionLabel, 0, 0, 3, 1);
+        pane.getChildren().add(instructionLabel);
 
         // Add the result Text node to column 3, row 5
         guessResultText.setFont(Font.font("Verdana", FontWeight.NORMAL, FontPosture.REGULAR, 14));
-        guessResultText.setText("Testing");
-        pane.add(guessResultText, 0, 5, 1, 1);
+        guessResultText.setText("");
+        pane.getChildren().add(guessResultText);
 
-        // Add the guessEntry node to column 1 -3, row 7
-        guessEntryField.setText("Place your guess Here");
+        // Guess Entry Field
         guessEntryField.setAlignment(Pos.CENTER);
-        pane.add(guessEntryField, 0, 7, 2, 1);
+        pane.getChildren().add(guessEntryField);
+        guessEntryField.setOnAction(this::processTextField);
 
-        guessSubmissionButton.setOnKeyPressed(this::guessEnter);
-        pane.add(guessSubmissionButton, 2, 7, 1, 1);
+        // Submission button
+        guessSubmissionButton.setOnKeyPressed(this::guess);
+        pane.getChildren().add(guessSubmissionButton);
 
 
         // Add the pane to the scene
-        Scene sceneOne = new Scene(pane, 300, 300, Color.ALICEBLUE);
-        guessResultText.setWrappingWidth(sceneOne.getWidth()/2);
-
-
+        Scene sceneOne = new Scene(pane, 250, 200, Color.ALICEBLUE);
+        guessResultText.setWrappingWidth(sceneOne.getWidth() / 2);
 
         // Configure the state and add the scene.
+        stage.setResizable(false);
         stage.setTitle("Number Guesser");
         stage.setScene(sceneOne);
         stage.show();
@@ -87,26 +86,34 @@ public class HiLoGame extends Application {
     }
 
     public void guess(Event e) {
-        guessResultText.setText("It worked.");
-        guessResultText.setFill(Color.color(numberGenerator.nextDouble(), numberGenerator.nextDouble(),
-                numberGenerator.nextDouble(), numberGenerator.nextDouble()));
+        guessResultText.setFill(Color.OLIVEDRAB);
         try {
             int guessValue = Integer.parseInt(guessEntryField.getText());
-            if(guessValue < hiddenNumber){
-                guessResultText.setText(TOO_LOW);
+            guessEntryField.setText("");
+            if(guessValue > 100){
+                throw new NumberFormatException();
+            }
+
+            if (guessValue < hiddenNumber) {
+                guessResultText.setText(TOO_LOW + "\n\nPrevious Guess: " + guessValue);
             } else if (guessValue > hiddenNumber) {
-                guessResultText.setText(TOO_HIGH);
+                guessResultText.setText(TOO_HIGH + "\n\nPrevious Guess: " + guessValue);
             } else {
                 guessResultText.setText(SUCCESS);
+                hiddenNumber = numberGenerator.nextInt(100) + 1;
             }
-        } catch (NumberFormatException formatException) {
-            guessResultText.setText("Please enter a numeric value between 1 and 100");
+        } catch(NumberFormatException formatException) {
+            guessResultText.setText(NUMBER_ERROR);
+            guessEntryField.setText("");
         }
     }
 
-    public void guessEnter(KeyEvent e) {
-        if (e.getCode() == KeyCode.ENTER) {
-            guess(new Event(Event.ANY));
-        }
+    private void processTextField(ActionEvent event){
+        guess(event);
     }
+//    public void guessEnter(KeyEvent e) {
+//        if (e.getCode() == KeyCode.ENTER) {
+//            guess(new Event(Event.ANY));
+//        }
+//    }
 }
