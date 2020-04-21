@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -17,6 +18,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.nio.file.Paths;
 import java.util.Random;
 
 public class HiLoGame extends Application {
@@ -66,7 +70,28 @@ public class HiLoGame extends Application {
         guessEntryField.setOnAction(this::processTextField);
 
         // Submission button
-        guessSubmissionButton.setOnKeyPressed(this::guess);
+        guessSubmissionButton.setOnKeyPressed((e) -> {
+            guessResultText.setFill(Color.OLIVEDRAB);
+            try {
+                int guessValue = Integer.parseInt(guessEntryField.getText());
+                guessEntryField.setText("");
+                if (guessValue > 100) {
+                    throw new NumberFormatException();
+                }
+
+                if (guessValue < hiddenNumber) {
+                    guessResultText.setText(TOO_LOW + "\n\nPrevious Guess: " + guessValue);
+                } else if (guessValue > hiddenNumber) {
+                    guessResultText.setText(TOO_HIGH + "\n\nPrevious Guess: " + guessValue);
+                } else {
+                    guessResultText.setText(SUCCESS);
+                    hiddenNumber = numberGenerator.nextInt(100) + 1;
+                }
+            } catch (NumberFormatException formatException) {
+                guessResultText.setText(NUMBER_ERROR);
+                guessEntryField.setText("");
+            }
+        });
         pane.getChildren().add(guessSubmissionButton);
 
 
@@ -78,6 +103,11 @@ public class HiLoGame extends Application {
         stage.setResizable(false);
         stage.setTitle("Number Guesser");
         stage.setScene(sceneOne);
+        stage.getIcons()
+                .add(
+                        new Image(
+                                new FileInputStream(
+                                        new File("C:\\Users\\Admin\\Pictures\\cannabis-marijuana-leaf-icon-vector-23795054.jpg"))));
         stage.show();
     }
 
@@ -90,7 +120,7 @@ public class HiLoGame extends Application {
         try {
             int guessValue = Integer.parseInt(guessEntryField.getText());
             guessEntryField.setText("");
-            if(guessValue > 100){
+            if (guessValue > 100) {
                 throw new NumberFormatException();
             }
 
@@ -102,13 +132,13 @@ public class HiLoGame extends Application {
                 guessResultText.setText(SUCCESS);
                 hiddenNumber = numberGenerator.nextInt(100) + 1;
             }
-        } catch(NumberFormatException formatException) {
+        } catch (NumberFormatException formatException) {
             guessResultText.setText(NUMBER_ERROR);
             guessEntryField.setText("");
         }
     }
 
-    private void processTextField(ActionEvent event){
+    private void processTextField(ActionEvent event) {
         guess(event);
     }
 //    public void guessEnter(KeyEvent e) {
